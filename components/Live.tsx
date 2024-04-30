@@ -1,14 +1,15 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // 'use client'
 import React, { useCallback, useEffect, useState } from 'react'
 import LiveCursors from './cursor/LiveCursors'
 import { useMyPresence, useOthers } from '@/liveblocks.config'
 import CursorChat from './cursor/CursorChat'
-import { CursorMode } from '@/types/type'
+import { CursorMode, CursorState } from '@/types/type'
 
 const Live = () => {
     const others = useOthers()
     const [{cursor},updateMyPresence] = useMyPresence() as any;
-    const [cursorState, setCursorState] = useState({
+    const [cursorState, setCursorState] = useState<CursorState>({
         mode: CursorMode.Hidden
     })
 
