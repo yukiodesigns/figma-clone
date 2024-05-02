@@ -5,8 +5,8 @@ import Navbar from "@/components/Navbar";
 import RightSideBar from "@/components/RightSideBar";
 import { useEffect, useRef, useState } from "react";
 import {fabric} from "fabric"
-import { handleCanvasMouseDown, handleCanvasMouseUp, handleCanvasObjectModified, handleCanvaseMouseMove, handleResize, initializeFabric, renderCanvas } from "@/lib/canvas";
-import { ActiveElement } from "@/types/type";
+import { handleCanvasMouseDown, handleCanvasMouseUp, handleCanvasObjectModified, handleCanvasObjectScaling, handleCanvasSelectionCreated, handleCanvaseMouseMove, handleResize, initializeFabric, renderCanvas } from "@/lib/canvas";
+import { ActiveElement, Attributes } from "@/types/type";
 import { useMutation, useRedo, useStorage, useUndo } from "@/liveblocks.config";
 import { defaultNavElement } from "@/constants";
 import { handleDelete, handleKeyDown } from "@/lib/key-events";
@@ -22,7 +22,10 @@ export default function Page() {
   const selectedShapeRef = useRef<string | null>(null)
   const activeObjectRef = useRef<fabric.Object | null>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
-
+  const isEditingRef = useRef(false)
+  const[elementAttributes, setElementAttributes] = useState<Attributes>({
+    width:'', height:'',fontSize:'', fontFamily:'',fontWeight:'', fill:'#aabbcc',stroke:'#aabbcc'
+  })
 
   const canvasObjects = useStorage((root)=> root.canvasObjects)
   const syncShapeInStorage = useMutation(({storage}, object) =>{
@@ -42,8 +45,8 @@ export default function Page() {
   const deleteAllShapes = useMutation(({storage}) =>{
     const canvasObjects = storage.get('canvasObjects')
     if(!canvasObjects || canvasObjects.size === 0) return true;
-    for(const [key, value] of canvasObjects.entries()){
-      canvasObjects.delete(key)
+    for (const [key, value] of canvasObjects.entries()) {
+      canvasObjects.delete(key);
     }
     return canvasObjects.size === 0
   },[])
@@ -95,8 +98,18 @@ export default function Page() {
         options, syncShapeInStorage
       })
     })
+    canvas.on("selection:created",(options:any)=>{
+      handleCanvasSelectionCreated({
+        options, isEditingRef, setElementAttributes
+      })
+    })
+    canvas.on("object:scaling",(options:any)=>{
+      handleCanvasObjectScaling({
+        options, setElementAttributes
+      })
+    })
     window.addEventListener("resize", ()=>{
-      handleResize({fabricRef})
+      handleResize({canvas: fabricRef.current,})
     })
     window.addEventListener('keydown', (e)=>{
       handleKeyDown({
@@ -124,7 +137,8 @@ export default function Page() {
       <section className="flex h-full flex-row">
         <LeftSideBar allShapes={Array.from(canvasObjects)} />
           <Live canvasRef={canvasRef} />
-        <RightSideBar />
+        <RightSideBar elementAttributes={elementAttributes} setElementAttributes={setElementAttributes}
+        fabricRef={fabricRef} isEditingRef={isEditingRef} activeObjectRef={activeObjectRef} syncShapeInStorage={syncShapeInStorage} />
       </section>
     </main>
   );
