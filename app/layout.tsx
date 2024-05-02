@@ -1,12 +1,10 @@
 import { Work_Sans } from "next/font/google";
-
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
-
 import Room from "./Room";
 
 export const metadata = {
-  title: "Figma Clone",
+  title: "Yukis Figma",
   description:
     "A minimalist Figma clone using fabric.js and Liveblocks for realtime collaboration",
 };
