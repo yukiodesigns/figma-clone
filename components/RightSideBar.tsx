@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import Dimensions from './settings/Dimensions'
 import Text from './settings/Text'
 import Color from './settings/Color'
@@ -7,6 +7,8 @@ import { RightSidebarProps } from '@/types/type'
 import { modifyShape } from '@/lib/shapes'
 
 const RightSideBar = ({elementAttributes, setElementAttributes, fabricRef, activeObjectRef, isEditingRef, syncShapeInStorage}: RightSidebarProps) => {
+  const colorInputRef = useRef(null)
+  const colorStrokeRef = useRef(null)
   const handleInputChange =(property:string, value:string)=>{
     if(!isEditingRef.current) isEditingRef.current = true
     setElementAttributes((prev) => ({...prev, [property]:value}))
@@ -24,8 +26,10 @@ const RightSideBar = ({elementAttributes, setElementAttributes, fabricRef, activ
          height={elementAttributes.height} handleInputChange={handleInputChange} isEditingRef={isEditingRef} />
         <Text fontFamily={elementAttributes.fontFamily} 
         fontSize={elementAttributes.fontSize} fontWeight={elementAttributes.fontWeight} handleInputChange={handleInputChange} />
-        <Color />
-        <Color />
+        <Color inputRef={colorInputRef} 
+        attribute={elementAttributes.fill} attributeType='fill' placeholder='color' handleInputChange={handleInputChange} />
+        <Color inputRef={colorStrokeRef} 
+        attribute={elementAttributes.stroke} attributeType='stroke' placeholder='stroke' handleInputChange={handleInputChange}  />
         <Export />
     </section>
 
