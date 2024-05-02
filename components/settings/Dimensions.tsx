@@ -32,7 +32,7 @@ const Dimensions = ({ width, height, isEditingRef, handleInputChange }: Props) =
             className='input-ring'
             min={10}
             onChange={(e) => handleInputChange(item.property, e.target.value)}
-            onBlur={(e) => {
+            onBlur={() => {
               isEditingRef.current = false
             }}
           />
